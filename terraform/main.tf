@@ -31,9 +31,6 @@ module "storage" {
   cloudfront_oac_id   = module.cdn.oac_id
 }
 
-# ──────────────────────────────────────────
-# Database (RDS)
-# ──────────────────────────────────────────
 module "database" {
   source = "./modules/database"
 
