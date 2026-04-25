@@ -12,9 +12,6 @@ provider "aws" {
   region = var.aws_region
 }
 
-# ──────────────────────────────────────────
-# VPC & Networking
-# ──────────────────────────────────────────
 module "vpc" {
   source = "./modules/vpc"
 
@@ -26,9 +23,6 @@ module "vpc" {
   private_subnets    = var.private_subnets
 }
 
-# ──────────────────────────────────────────
-# Storage (S3)
-# ──────────────────────────────────────────
 module "storage" {
   source = "./modules/storage"
 
@@ -53,9 +47,6 @@ module "database" {
   db_password         = var.db_password
 }
 
-# ──────────────────────────────────────────
-# Compute (EC2 + ALB + ASG)
-# ──────────────────────────────────────────
 module "compute" {
   source = "./modules/compute"
 
@@ -74,9 +65,6 @@ module "compute" {
   aws_region         = var.aws_region
 }
 
-# ──────────────────────────────────────────
-# CDN (CloudFront)
-# ──────────────────────────────────────────
 module "cdn" {
   source = "./modules/cdn"
 
