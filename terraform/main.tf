@@ -13,9 +13,8 @@ provider "aws" {
   region = var.aws_region
 }
 
-############################
-# Foundation Layer
-############################
+# --- networking
+
 module "network" {
   source = "../../modules/network"
 
@@ -26,19 +25,17 @@ module "network" {
   private_subnets    = var.private_subnets
 }
 
-############################
-# Platform Layer
-############################
+# --- data + storage
+
 module "data" {
   source = "../../modules/data"
 
-  name_prefix       = local.name_prefix
-  vpc_id            = module.network.vpc_id
+  name_prefix        = local.name_prefix
+  vpc_id             = module.network.vpc_id
   private_subnet_ids = module.network.private_subnet_ids
-
-  db_name     = var.db_name
-  db_username = var.db_username
-  db_password = var.db_password
+  db_name            = var.db_name
+  db_username        = var.db_username
+  db_password        = var.db_password
 }
 
 module "assets" {
@@ -50,14 +47,13 @@ module "assets" {
 module "edge" {
   source = "../../modules/edge"
 
-  name_prefix    = local.name_prefix
-  bucket_id      = module.assets.bucket_id
-  bucket_arn     = module.assets.bucket_arn
+  name_prefix = local.name_prefix
+  bucket_id   = module.assets.bucket_id
+  bucket_arn  = module.assets.bucket_arn
 }
 
-############################
-# Application Layer
-############################
+# --- application
+
 module "app" {
   source = "../../modules/app"
 
@@ -65,26 +61,20 @@ module "app" {
   vpc_id             = module.network.vpc_id
   public_subnet_ids  = module.network.public_subnet_ids
   private_subnet_ids = module.network.private_subnet_ids
-
-  instance_type = var.instance_type
-  key_name      = var.key_name
-
-  db_endpoint = module.data.db_endpoint
-  db_name     = var.db_name
-  db_username = var.db_username
-  db_password = var.db_password
-
-  bucket_name = module.assets.bucket_name
+  instance_type      = var.instance_type
+  key_name           = var.key_name
+  db_endpoint        = module.data.db_endpoint
+  db_name            = var.db_name
+  db_username        = var.db_username
+  db_password        = var.db_password
+  bucket_name        = module.assets.bucket_name
 }
 
-############################
-# Cross-layer wiring
-############################
+# wire CloudFront to the ALB after both edge + app are up
 module "edge_integration" {
-  source = "../../modules/edge-integration"
+  source = "../../modules/edge_integration"
 
-  name_prefix = local.name_prefix
-
+  name_prefix  = local.name_prefix
   alb_dns_name = module.app.alb_dns_name
   oac_id       = module.edge.oac_id
 }
