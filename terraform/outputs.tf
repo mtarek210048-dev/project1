@@ -1,19 +1,36 @@
-output "cloudfront_url" {
-  value       = "https://${module.cdn.cloudfront_domain}"
+#################################
+# Edge / Public Access
+#################################
+output "app_url" {
+  description = "Public URL of the application via CDN"
+  value       = "https://${module.edge.cloudfront_domain}"
 }
 
-output "alb_dns_name" {
-  value       = module.compute.alb_dns_name
+output "load_balancer_endpoint" {
+  description = "Direct ALB endpoint (internal use / debugging)"
+  value       = module.app.alb_dns_name
 }
 
-output "rds_endpoint" {
-  value       = module.database.db_endpoint
+#################################
+# Data Layer
+#################################
+output "database_endpoint" {
+  description = "Primary database connection endpoint"
+  value       = module.data.db_endpoint
 }
 
-output "s3_bucket_name" {
-  value       = module.storage.bucket_name
+#################################
+# Storage
+#################################
+output "assets_bucket_name" {
+  description = "S3 bucket storing static assets"
+  value       = module.assets.bucket_name
 }
 
-output "vpc_id" {
-  value       = module.vpc.vpc_id
+#################################
+# Networking
+#################################
+output "network_id" {
+  description = "Primary VPC ID"
+  value       = module.network.vpc_id
 }
