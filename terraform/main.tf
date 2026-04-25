@@ -66,7 +66,7 @@ module "app" {
   db_endpoint        = module.data.db_endpoint
   db_name            = var.db_name
   db_username        = var.db_username
-  db_password        = var.db_password
+  db_secret_arn = module.data.db_secret_arn
   bucket_name        = module.assets.bucket_name
 }
 
