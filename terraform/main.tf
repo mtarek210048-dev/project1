@@ -13,62 +13,78 @@ provider "aws" {
   region = var.aws_region
 }
 
-module "vpc" {
-  source = "./modules/vpc"
+############################
+# Foundation Layer
+############################
+module "network" {
+  source = "../../modules/network"
 
-  project_name       = var.project_name
-  environment        = var.environment
+  name_prefix        = local.name_prefix
   vpc_cidr           = var.vpc_cidr
   availability_zones = var.availability_zones
   public_subnets     = var.public_subnets
   private_subnets    = var.private_subnets
 }
 
-module "storage" {
-  source = "./modules/storage"
+############################
+# Platform Layer
+############################
+module "data" {
+  source = "../../modules/data"
 
-  project_name      = var.project_name
-  environment       = var.environment
-  cloudfront_oac_id = module.cdn.oac_id
+  name_prefix       = local.name_prefix
+  vpc_id            = module.network.vpc_id
+  private_subnet_ids = module.network.private_subnet_ids
+
+  db_name     = var.db_name
+  db_username = var.db_username
+  db_password = var.db_password
 }
 
-module "database" {
-  source = "./modules/database"
+module "assets" {
+  source = "../../modules/assets"
 
-  project_name       = var.project_name
-  environment        = var.environment
-  vpc_id             = module.vpc.vpc_id
-  private_subnet_ids = module.vpc.private_subnet_ids
-  app_sg_id          = module.compute.app_sg_id
-  db_name            = var.db_name
-  db_username        = var.db_username
-  db_password        = var.db_password
+  name_prefix = local.name_prefix
 }
 
-module "compute" {
-  source = "./modules/compute"
+module "edge" {
+  source = "../../modules/edge"
 
-  project_name       = var.project_name
-  environment        = var.environment
-  vpc_id             = module.vpc.vpc_id
-  public_subnet_ids  = module.vpc.public_subnet_ids
-  private_subnet_ids = module.vpc.private_subnet_ids
-  instance_type      = var.instance_type
-  key_name           = var.key_name
-  s3_bucket_name     = module.storage.bucket_name
-  db_endpoint        = module.database.db_endpoint
-  db_name            = var.db_name
-  db_username        = var.db_username
-  db_password        = var.db_password
-  aws_region         = var.aws_region
+  name_prefix    = local.name_prefix
+  bucket_id      = module.assets.bucket_id
+  bucket_arn     = module.assets.bucket_arn
 }
 
-module "cdn" {
-  source = "./modules/cdn"
+############################
+# Application Layer
+############################
+module "app" {
+  source = "../../modules/app"
 
-  project_name  = var.project_name
-  environment   = var.environment
-  s3_bucket_id  = module.storage.bucket_id
-  s3_bucket_arn = module.storage.bucket_arn
-  alb_dns_name  = module.compute.alb_dns_name
+  name_prefix        = local.name_prefix
+  vpc_id             = module.network.vpc_id
+  public_subnet_ids  = module.network.public_subnet_ids
+  private_subnet_ids = module.network.private_subnet_ids
+
+  instance_type = var.instance_type
+  key_name      = var.key_name
+
+  db_endpoint = module.data.db_endpoint
+  db_name     = var.db_name
+  db_username = var.db_username
+  db_password = var.db_password
+
+  bucket_name = module.assets.bucket_name
+}
+
+############################
+# Cross-layer wiring
+############################
+module "edge_integration" {
+  source = "../../modules/edge-integration"
+
+  name_prefix = local.name_prefix
+
+  alb_dns_name = module.app.alb_dns_name
+  oac_id       = module.edge.oac_id
 }
