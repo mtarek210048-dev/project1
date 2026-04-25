@@ -1,71 +1,69 @@
-variable "aws_region" {
-  description = "AWS region to deploy into"
+############################
+# Global Configuration
+############################
+variable "region" {
+  description = "AWS region for deployment"
   type        = string
-  default     = "eu-north-1"
-}
 
-variable "project_name" {
-  description = "Used as a prefix for all resource names"
-  type        = string
-  default     = "three-tier-app"
+  validation {
+    condition     = length(var.region) > 0
+    error_message = "Region must not be empty."
+  }
 }
 
 variable "environment" {
-  description = "Deployment environment (dev / staging / prod)"
+  description = "Deployment environment"
   type        = string
-  default     = "dev"
+
+  validation {
+    condition     = contains(["dev", "staging", "prod"], var.environment)
+    error_message = "Environment must be one of: dev, staging, prod."
+  }
 }
 
-variable "vpc_cidr" {
-  description = "CIDR block for the VPC"
+variable "project" {
+  description = "Project identifier used in naming"
   type        = string
-  default     = "10.0.0.0/16"
 }
 
-variable "availability_zones" {
-  description = "List of AZs to use"
-  type        = list(string)
-  default     = ["eu-north-1a", "eu-north-1b"]
+############################
+# Networking
+############################
+variable "network_config" {
+  description = "Networking configuration for VPC and subnets"
+  type = object({
+    vpc_cidr           = string
+    availability_zones = list(string)
+    public_subnets     = list(string)
+    private_subnets    = list(string)
+  })
 }
 
-variable "public_subnets" {
-  description = "CIDR blocks for public subnets (one per AZ)"
-  type        = list(string)
-  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+############################
+# Compute
+############################
+variable "app_config" {
+  description = "Application compute configuration"
+  type = object({
+    instance_type = string
+    key_name      = optional(string)
+  })
+
+  default = {
+    instance_type = "t3.micro"
+  }
 }
 
-variable "private_subnets" {
-  description = "CIDR blocks for private subnets (one per AZ)"
-  type        = list(string)
-  default     = ["10.0.11.0/24", "10.0.12.0/24"]
-}
+############################
+# Database
+############################
+variable "database_config" {
+  description = "Database configuration"
+  type = object({
+    name     = string
+    username = string
+    password = string
+  })
 
-variable "instance_type" {
-  description = "EC2 instance type for app servers"
-  type        = string
-  default     = "t3.micro"
-}
-
-variable "key_name" {
-  description = "Name of an existing EC2 key pair for SSH access"
-  type        = string
-  default     = ""
-}
-
-variable "db_name" {
-  description = "Name of the MySQL database"
-  type        = string
-  default     = "appdb"
-}
-
-variable "db_username" {
-  description = "RDS master username"
-  type        = string
-  default     = "admin"
-}
-
-variable "db_password" {
-  description = "RDS master password — pass via TF_VAR_db_password env var"
-  type        = string
-  sensitive   = true
+  sensitive = true
 }
