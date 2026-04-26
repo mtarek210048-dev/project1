@@ -31,7 +31,6 @@ resource "aws_cloudfront_distribution" "main" {
     }
   }
 
-  # ── Default cache — S3 static assets ──
   default_cache_behavior {
     allowed_methods = ["GET", "HEAD"]
     cached_methods = ["GET", "HEAD"]
