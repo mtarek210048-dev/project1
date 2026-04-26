@@ -1,36 +1,30 @@
-#################################
-# Edge / Public Access
-#################################
+# --- public access
 output "app_url" {
-  description = "Public URL of the application via CDN"
+  description = "CloudFront domain — share this one, not the ALB"
   value       = "https://${module.edge.cloudfront_domain}"
 }
 
 output "load_balancer_endpoint" {
-  description = "Direct ALB endpoint (internal use / debugging)"
+  description = "ALB endpoint, internal use only"
   value       = module.app.alb_dns_name
+  sensitive   = true
 }
 
-#################################
-# Data Layer
-#################################
+# --- data layer
 output "database_endpoint" {
-  description = "Primary database connection endpoint"
+  description = "RDS endpoint — reachable from private subnets only"
   value       = module.data.db_endpoint
+  sensitive   = true
 }
 
-#################################
-# Storage
-#################################
+# --- storage
 output "assets_bucket_name" {
-  description = "S3 bucket storing static assets"
+  description = "S3 bucket for static assets"
   value       = module.assets.bucket_name
 }
 
-#################################
-# Networking
-#################################
-output "network_id" {
-  description = "Primary VPC ID"
+# --- networking
+output "vpc_id" {
+  description = "VPC ID"
   value       = module.network.vpc_id
 }
