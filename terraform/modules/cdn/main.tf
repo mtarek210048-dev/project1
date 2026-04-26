@@ -7,16 +7,12 @@ resource "aws_cloudfront_origin_access_control" "s3_oac" {
   signing_protocol = "sigv4"
 }
 
-# ──────────────────────────────────────────
-# CloudFront Distribution
-# ──────────────────────────────────────────
 resource "aws_cloudfront_distribution" "main" {
   enabled = true
-  is_ipv6_enabled     = true
+  is_ipv6_enabled = true
   comment = "${var.project_name}-${var.environment}"
   default_root_object = "index.html"
 
-  # ── Origin 1: S3 (static assets) ──────
   origin {
     domain_name = "${var.s3_bucket_id}.s3.amazonaws.com"
     origin_id = "S3Origin"
