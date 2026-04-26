@@ -11,7 +11,7 @@ terraform {
 
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
+      source = "hashicorp/aws"
       version = "~> 5.0"
     }
   }
@@ -25,10 +25,10 @@ provider "aws" {
 module "network" {
   source = "./modules/network"
 
-  name_prefix  = "${var.project_name}-${var.environment}"
+  name_prefix = "${var.project_name}-${var.environment}"
   vpc_cidr  = var.vpc_cidr
   availability_zones = var.availability_zones
-  public_subnets  = var.public_subnets
+  public_subnets = var.public_subnets
   private_subnets = var.private_subnets
 }
 
@@ -37,18 +37,18 @@ module "data" {
   source = "./modules/data"
 
   name_prefix = "${var.project_name}-${var.environment}"
-  vpc_id   = module.network.vpc_id
+  vpc_id = module.network.vpc_id
   private_subnet_ids = module.network.private_subnet_ids
-  app_sg_id  = module.app.app_sg_id
-  db_name  = var.db_name
+  app_sg_id = module.app.app_sg_id
+  db_name= var.db_name
   db_username = var.db_username
 }
 
 module "assets" {
   source = "./modules/assets"
 
-  name_prefix     = "${var.project_name}-${var.environment}"
-  environment   = var.environment
+  name_prefix = "${var.project_name}-${var.environment}"
+  environment = var.environment
   allowed_origins = var.allowed_origins
 }
 
@@ -56,9 +56,9 @@ module "edge" {
   source = "./modules/edge"
 
   name_prefix = "${var.project_name}-${var.environment}"
-  bucket_id   = module.assets.bucket_id
-  bucket_arn  = module.assets.bucket_arn
-  waf_enabled  = var.waf_enabled
+  bucket_id = module.assets.bucket_id
+  bucket_arn = module.assets.bucket_arn
+  waf_enabled = var.waf_enabled
   allowed_origins = var.allowed_origins
 }
 
@@ -74,8 +74,8 @@ module "app" {
   key_name  = var.key_name
   min_size = var.min_size
   max_size = var.max_size
-  db_endpoint  = module.data.db_endpoint
-  db_name   = var.db_name
+  db_endpoint = module.data.db_endpoint
+  db_name = var.db_name
   db_username  = var.db_username
   db_secret_arn = module.data.db_secret_arn
   bucket_name  = module.assets.bucket_name
@@ -90,12 +90,11 @@ module "edge_integration" {
   oac_id = module.edge.oac_id
 }
 
-# alerts for asg, rds and alb — tweak thresholds in the module if needed
 module "monitoring" {
   source = "./modules/monitoring"
 
-  name_prefix  = "${var.project_name}-${var.environment}"
-  asg_name  = module.app.asg_name
+  name_prefix = "${var.project_name}-${var.environment}"
+  asg_name = module.app.asg_name
   db_identifier = module.data.db_identifier
   alb_arn_suffix = module.app.alb_arn_suffix
   alarm_email  = var.alarm_email
