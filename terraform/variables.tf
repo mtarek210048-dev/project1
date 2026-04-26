@@ -1,7 +1,7 @@
 # global
 variable "aws_region" {
   description = "region to deploy into, e.g. eu-north-1"
-  type        = string
+  type = string
   validation {
     condition = length(var.aws_region) > 0
     error_message = "region can't be empty."
@@ -62,7 +62,7 @@ variable "max_size" {
   default = 4
 }
 
-# --- database
+#database
 variable "db_name" {
   type = string
 }
@@ -71,7 +71,7 @@ variable "db_username" {
   type = string
 }
 
-# --- security + edge
+# security + edge
 variable "waf_enabled" {
   type = bool
   default = true
