@@ -3,26 +3,26 @@ variable "aws_region" {
   description = "region to deploy into, e.g. eu-north-1"
   type        = string
   validation {
-    condition     = length(var.aws_region) > 0
+    condition = length(var.aws_region) > 0
     error_message = "region can't be empty."
   }
 }
 
 variable "environment" {
   description = "dev, staging, or prod"
-  type        = string
+  type = string
   validation {
-    condition     = contains(["dev", "staging", "prod"], var.environment)
+    condition = contains(["dev", "staging", "prod"], var.environment)
     error_message = "must be one of: dev, staging, prod."
   }
 }
 
 variable "project_name" {
   description = "used as a prefix for all resource names"
-  type        = string
+  type = string
 }
 
-# --- networking
+# networking
 variable "vpc_cidr" {
   type    = string
   default = "10.0.0.0/16"
@@ -40,25 +40,25 @@ variable "private_subnets" {
   type = list(string)
 }
 
-# --- compute
+# compute
 variable "instance_type" {
-  type    = string
+  type = string
   default = "t3.micro"
 }
 
 variable "key_name" {
   description = "EC2 key pair for SSH — leave empty if not needed"
-  type        = string
-  default     = ""
+  type = string
+  default = ""
 }
 
 variable "min_size" {
-  type    = number
+  type = number
   default = 1
 }
 
 variable "max_size" {
-  type    = number
+  type = number
   default = 4
 }
 
@@ -75,17 +75,17 @@ variable "db_username" {
 
 # --- security + edge
 variable "waf_enabled" {
-  type    = bool
+  type = bool
   default = true
 }
 
 variable "allowed_origins" {
-  type    = list(string)
+  type = list(string)
   default = []
 }
 
-# --- monitoring
+# monitoring
 variable "alarm_email" {
   description = "gets paged when alarms fire"
-  type        = string
+  type = string
 }
