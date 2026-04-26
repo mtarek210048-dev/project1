@@ -1,4 +1,4 @@
-# --- global
+# global
 variable "aws_region" {
   description = "region to deploy into, e.g. eu-north-1"
   type        = string
@@ -70,8 +70,6 @@ variable "db_name" {
 variable "db_username" {
   type = string
 }
-
-# no db_password — generated internally by the data module
 
 # --- security + edge
 variable "waf_enabled" {
