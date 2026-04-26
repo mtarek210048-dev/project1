@@ -1,69 +1,91 @@
-############################
-# Global Configuration
-############################
-variable "region" {
-  description = "AWS region for deployment"
+# --- global
+variable "aws_region" {
+  description = "region to deploy into, e.g. eu-north-1"
   type        = string
-
   validation {
-    condition     = length(var.region) > 0
-    error_message = "Region must not be empty."
+    condition     = length(var.aws_region) > 0
+    error_message = "region can't be empty."
   }
 }
 
 variable "environment" {
-  description = "Deployment environment"
+  description = "dev, staging, or prod"
   type        = string
-
   validation {
     condition     = contains(["dev", "staging", "prod"], var.environment)
-    error_message = "Environment must be one of: dev, staging, prod."
+    error_message = "must be one of: dev, staging, prod."
   }
 }
 
-variable "project" {
-  description = "Project identifier used in naming"
+variable "project_name" {
+  description = "used as a prefix for all resource names"
   type        = string
 }
 
-############################
-# Networking
-############################
-variable "network_config" {
-  description = "Networking configuration for VPC and subnets"
-  type = object({
-    vpc_cidr           = string
-    availability_zones = list(string)
-    public_subnets     = list(string)
-    private_subnets    = list(string)
-  })
+# --- networking
+variable "vpc_cidr" {
+  type    = string
+  default = "10.0.0.0/16"
 }
 
-############################
-# Compute
-############################
-variable "app_config" {
-  description = "Application compute configuration"
-  type = object({
-    instance_type = string
-    key_name      = optional(string)
-  })
-
-  default = {
-    instance_type = "t3.micro"
-  }
+variable "availability_zones" {
+  type = list(string)
 }
 
-############################
-# Database
-############################
-variable "database_config" {
-  description = "Database configuration"
-  type = object({
-    name     = string
-    username = string
-    password = string
-  })
+variable "public_subnets" {
+  type = list(string)
+}
 
-  sensitive = true
+variable "private_subnets" {
+  type = list(string)
+}
+
+# --- compute
+variable "instance_type" {
+  type    = string
+  default = "t3.micro"
+}
+
+variable "key_name" {
+  description = "EC2 key pair for SSH — leave empty if not needed"
+  type        = string
+  default     = ""
+}
+
+variable "min_size" {
+  type    = number
+  default = 1
+}
+
+variable "max_size" {
+  type    = number
+  default = 4
+}
+
+# --- database
+variable "db_name" {
+  type = string
+}
+
+variable "db_username" {
+  type = string
+}
+
+# no db_password — generated internally by the data module
+
+# --- security + edge
+variable "waf_enabled" {
+  type    = bool
+  default = true
+}
+
+variable "allowed_origins" {
+  type    = list(string)
+  default = []
+}
+
+# --- monitoring
+variable "alarm_email" {
+  description = "gets paged when alarms fire"
+  type        = string
 }
