@@ -52,9 +52,7 @@ resource "aws_security_group" "app" {
   tags = { Name = "${var.project_name}-${var.environment}-app-sg", Project = var.project_name }
 }
 
-# ──────────────────────────────────────────
-# IAM Role for EC2 (S3 access)
-# ──────────────────────────────────────────
+
 resource "aws_iam_role" "ec2_role" {
   name = "${var.project_name}-${var.environment}-ec2-role"
 
