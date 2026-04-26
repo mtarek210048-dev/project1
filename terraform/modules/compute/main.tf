@@ -28,7 +28,6 @@ resource "aws_security_group" "alb" {
   tags = { Name = "${var.project_name}-${var.environment}-alb-sg", Project = var.project_name }
 }
 
-# App SG — accepts traffic only from ALB SG
 resource "aws_security_group" "app" {
   name = "${var.project_name}-${var.environment}-app-sg"
   description = "Allow traffic from ALB only"
