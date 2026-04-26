@@ -62,7 +62,7 @@ module "edge" {
   allowed_origins = var.allowed_origins
 }
 
-# --- application layer
+#  application layer
 module "app" {
   source = "./modules/app"
 
@@ -81,7 +81,7 @@ module "app" {
   bucket_name  = module.assets.bucket_name
 }
 
-# --- edge wiring (cdn <-> alb)
+# edge wiring (cdn <-> alb)
 module "edge_integration" {
   source = "./modules/edge_integration"
 
